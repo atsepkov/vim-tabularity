@@ -66,6 +66,14 @@ function! s:getRange(...)
 	return s . ',' . f
 endfunction
 
+function! s:getchar()
+	let c = getchar()
+	if c =~ '^\d\+$'
+		let c = nr2char(c)
+	endif
+	return c
+endfunction
+
 
 " This function can be used by various languages to auto-align lines based on
 " a certain delimeter. In perl, for example, one could auto-align hashes on =>
@@ -111,11 +119,16 @@ endfunction
 
 " Wraps the above function for easy user input
 function! tabularity#Do(...)
-	let result = input('')
+	let seq = ''
+	let c = s:getchar()
+	while c != "\<CR>"
+		let seq .= c
+		let c = s:getchar()
+	endwhile
 	if a:0 > 0
-		let range = tabularity#Command(result, a:1)
+		let range = tabularity#Command(seq, a:1)
 	else
-		let range = tabularity#Command(result)
+		let range = tabularity#Command(seq)
 	endif
 endfunction
 
