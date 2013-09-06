@@ -109,6 +109,17 @@ function! tabularity#Command(command, ...)
 endfunction
 
 
+" Wraps the above function for easy user input
+function! tabularity#Do(...)
+	let result = input('')
+	if a:0 > 0
+		let range = tabularity#Command(result, a:1)
+	else
+		let range = tabularity#Command(result)
+	endif
+endfunction
+
+
 " This function takes a sequence of words and converts them to sequence of
 " rows, inheriting indentation level of the first word
 function! tabularity#Unfold()
