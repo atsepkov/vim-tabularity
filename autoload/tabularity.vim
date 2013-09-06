@@ -63,10 +63,11 @@ function! s:getRange(...)
 		return
 	endif
 
-	return s . ',' . f
+	return [s, f]
+"	return s . ',' . f
 endfunction
 
-function! s:getchar()
+function! s:getChar()
 	let c = getchar()
 	if c =~ '^\d\+$'
 		let c = nr2char(c)
@@ -94,7 +95,7 @@ function! tabularity#Align(delim, ...)
 		let column = strlen(substitute(getline('.')[0:col('.')],'[^' . a:delim[0] . ']','','g'))
 		let position = strlen(matchstr(getline('.')[0:col('.')],'.*' . a:delim . '\s*\zs.*'))
 		let pos = getpos('.')
-		execute range . 'Tabularize/' . a:delim . '/l1'
+		execute range[0] . ',' . range[1] . 'Tabularize/' . a:delim . '/l1'
 		call setpos('.', pos)
 		normal! 0
 		call search(repeat('[^' . a:delim[0] . ']*' . a:delim ,column).'\s\{-\}'.repeat('.',position),'ce',line('.'))
@@ -112,7 +113,7 @@ function! tabularity#Command(command, ...)
 	endif
 	let pos = getpos('.')
 	let column = col('.')
-	execute range . ' normal ' . column . 'lb ' . a:command
+	execute range[0] . ',' . range[1] . ' normal ' . column . 'lb ' . a:command
 	call setpos('.', pos)
 endfunction
 
@@ -120,15 +121,15 @@ endfunction
 " Wraps the above function for easy user input
 function! tabularity#Do(...)
 	let seq = ''
-	let c = s:getchar()
+	let c = s:getChar()
 	while c != "\<CR>"
 		let seq .= c
-		let c = s:getchar()
+		let c = s:getChar()
 	endwhile
 	if a:0 > 0
-		let range = tabularity#Command(seq, a:1)
+		call tabularity#Command(seq, a:1)
 	else
-		let range = tabularity#Command(seq)
+		call tabularity#Command(seq)
 	endif
 endfunction
 
@@ -157,24 +158,14 @@ endfunction
 " This function effectively undoes the unfolding done by the previous one
 function! tabularity#Fold(...)
 	if a:0 > 0
-		let delim = a:1
+		let range = s:getRange(a:1)
 	else
-		let delim = ' '
+		let range = s:getRange()
 	endif
-"	execute range . ' normal ^d0i'
-	let s = line('.')
-	let f = s
-	let myindent = indent(s)
-	while indent(s-1) == myindent && (a:0 == 0 || getline(s-1) =~# a:1)
-		let s -= 1
-	endwhile
-	while indent(f+1) == myindent && (a:0 == 0 || getline(f+1) =~# a:1)
-		let f += 1
-	endwhile
-	execute f
-	while f > s
+	execute range[1]
+	while range[1] > range[0]
 		normal ^d0i
-		let f -= 1
+		let range[1] -= 1
 	endw
 "	normal Bi
 endfunction
