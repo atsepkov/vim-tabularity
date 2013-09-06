@@ -148,7 +148,20 @@ function! tabularity#Fold(...)
 	else
 		let delim = ' '
 	endif
-	let range = s:getRange()
-	execute range . ' normal ^d0i'
+"	execute range . ' normal ^d0i'
+	let s = line('.')
+	let f = s
+	let myindent = indent(s)
+	while indent(s-1) == myindent && (a:0 == 0 || getline(s-1) =~# a:1)
+		let s -= 1
+	endwhile
+	while indent(f+1) == myindent && (a:0 == 0 || getline(f+1) =~# a:1)
+		let f += 1
+	endwhile
+	execute f
+	while f > s
+		normal ^d0i
+		let f -= 1
+	endw
 "	normal Bi
 endfunction
