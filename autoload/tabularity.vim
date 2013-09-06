@@ -38,17 +38,8 @@
 " EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-
-
-" This function can be used by various languages to auto-align lines based on
-" a certain delimeter. In perl, for example, one could auto-align hashes on =>
-" Takes a delimeter to use for aligning and optional regex to test against
-" each line in range to remove false positives.
-"
-" Usage examples:
-"	Perl:	inoremap <silent> > ><Esc>:call tabularity#Align('=>')<CR>a
-"	Python:	inoremap <silent> : :<Esc>:call tabularity#Align(':', '\[\'"\]\?\[A-Za-z_-\]\[A-Za-z0-9_-\]*\[\'"\]\:')<CR>a
-function! tabularity#Align(delim, ...)
+" private functions
+function! s:getRange(...)
 	" if 'validation' regex was provided, check if the line matches it before
 	" attempting any further logic
 	let l = getline('.')
@@ -72,17 +63,49 @@ function! tabularity#Align(delim, ...)
 		return
 	endif
 
-	" now apply tab to this range
+	return s . ',' . f
+endfunction
+
+
+" This function can be used by various languages to auto-align lines based on
+" a certain delimeter. In perl, for example, one could auto-align hashes on =>
+" Takes a delimeter to use for aligning and optional regex to test against
+" each line in range to remove false positives.
+"
+" Usage examples:
+"	Perl:	inoremap <silent> > ><Esc>:call tabularity#Align('=>')<CR>a
+"	Python:	inoremap <silent> : :<Esc>:call tabularity#Align(':', '\[\'"\]\?\[A-Za-z_-\]\[A-Za-z0-9_-\]*\[\'"\]\:')<CR>a
+function! tabularity#Align(delim, ...)
 	let p = '^.*' . a:delim . '\s.*$'
 	if exists(':Tabularize') && getline('.') =~# '^.*' . a:delim && (getline(line('.')-1) =~# p || getline(line('.')+1) =~# p)
+		if a:0 > 0
+			let range = s:getRange(a:1)
+		else
+			let range = s:getRange()
+		endif
 		let column = strlen(substitute(getline('.')[0:col('.')],'[^' . a:delim[0] . ']','','g'))
 		let position = strlen(matchstr(getline('.')[0:col('.')],'.*' . a:delim . '\s*\zs.*'))
 		let pos = getpos('.')
-		execute s . ',' . f . 'Tabularize/' . a:delim . '/l1'
+		execute range . 'Tabularize/' . a:delim . '/l1'
 		call setpos('.', pos)
 		normal! 0
 		call search(repeat('[^' . a:delim[0] . ']*' . a:delim ,column).'\s\{-\}'.repeat('.',position),'ce',line('.'))
 	endif
+endfunction
+
+
+" This function applies a certain command to all consecutive lines matching
+" the format of current line
+function! tabularity#Command(command, ...)
+	if a:0 > 0
+		let range = s:getRange(a:1)
+	else
+		let range = s:getRange()
+	endif
+	let pos = getpos('.')
+	let column = col('.')
+	execute range . ' normal ' . column . 'lb ' . a:command
+	call setpos('.', pos)
 endfunction
 
 
