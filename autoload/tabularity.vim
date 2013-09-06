@@ -122,11 +122,33 @@ endfunction
 
 " This function takes a sequence of words and converts them to sequence of
 " rows, inheriting indentation level of the first word
-function! tabularity#Unfold()
-	" to fill
+function! tabularity#Unfold(...)
+	if a:0 > 0
+		let delim = a:1
+	else
+		let delim = ' '
+	endif
+	let pos = getpos('.')
+	normal ^
+	let m = col('.')
+	normal $B
+	let c = col('.')
+	while c > m
+		normal ik$B
+		let c = col('.')
+	endwhile
+	call setpos('.', pos)
 endfunction
 
+
 " This function effectively undoes the unfolding done by the previous one
-function! tabularity#Fold()
-	" to fill
+function! tabularity#Fold(...)
+	if a:0 > 0
+		let delim = a:1
+	else
+		let delim = ' '
+	endif
+	let range = s:getRange()
+	execute range . ' normal ^d0i'
+"	normal Bi
 endfunction
