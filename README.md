@@ -66,7 +66,9 @@ Now all you need to do is modify the surrounding brackets. Likewise, if you want
 		"baz",
 	]
 
-You would simply need to run `:call tabularity#Do()` and enter `ds"A<Del>`. Tabularity will perform the command based on cursor position, so if you have the following sequence:
+You would simply need to run `:call tabularity#Do()` and enter `ds"A<Del>`.
+
+Tabularity will perform the command based on cursor position, so if you have the following sequence:
 
 	magenta ball
 	red box
@@ -118,6 +120,64 @@ The result will be:
 
 Speaking of comments, if you ever had to write docstrings for functions, you know how much of a pain it can be to make sure they are consistent and up-to-date. Adding a new function with a docstring to an already-existing behemoth module can be annoying. You know what arguments it needs, but the descriptions for them will need to be copy-pasted from other docstrings. `tabularity#Complete()` will handle that for you automatically, it will search the file for other lines beginning the same way, and complete each line using the first-found match.
 
+For example, if you have the following code:
+
+	################################
+	# Description:
+	#	The quick brown fox jumped over the lazy dog
+	#
+	# Arguments:
+	#	foo		This is the foo argument, commonly used with BAR
+	#	bar		Bar cannot be supplied without FOO
+	#	hello	A string used to greet the world
+	#	world	It's customary to greet it in your first program when you learn a new language
+	#
+	################################
+	def dummy_function(foo, bar, hello, world):
+		...
+
+	################################
+	# Description:
+	#	This is another description
+	#
+	# Arguments:
+	#	world
+	#	bar
+	#	food
+	################################
+	def new function(world, bar, food):
+		...
+
+You can auto-fill available arguments by putting the cursor on one of the arguments in the new function and running `tabularity#Complete()`, this will result in `world` and `bar` getting populated based on their descriptions in other function docstrings:
+
+	################################
+	# Description:
+	#	The quick brown fox jumped over the lazy dog
+	#
+	# Arguments:
+	#	foo		This is the foo argument, commonly used with BAR
+	#	bar		Bar cannot be supplied without FOO
+	#	hello	A string used to greet the world
+	#	world	It's customary to greet it in your first program when you learn a new language
+	#
+	################################
+	def dummy_function(foo, bar, hello, world):
+		...
+
+	################################
+	# Description:
+	#	This is another description
+	#
+	# Arguments:
+	#	world	It's customary to greet it in your first program when you learn a new language
+	#	bar		Bar cannot be supplied without FOO
+	#	food
+	################################
+	def new function(world, bar, food):
+		...
+
+The `food` argument will not be populated, since we haven't used it before.
+
 My Personal Mappings
 ====================
 
@@ -133,4 +193,4 @@ Here are some mappings I use for Tabularity to get you started:
 	nnoremap <Tab><Enter> :call tabularity#Unfold()
 	nnoremap <Tab><BS> :call tabularity#Fold()
 	nnoremap <Tab><Tab> :call tabularity#Complete()
-	nnoremap <Tab><Tab> :call tabularity#Do()
+	nnoremap <Tab><Space> :call tabularity#Do()
