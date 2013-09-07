@@ -68,19 +68,19 @@ Now all you need to do is modify the surrounding brackets. Likewise, if you want
 
 You would simply need to run `:call tabularity#Do()` and enter `ds"A<Del>`.
 
-Tabularity will perform the command based on cursor position, so if you have the following sequence:
+Tabularity will perform the command based on cursor position, which means you can manipulate the entire line (and all lines in vicinity that match the format), a word under cursor, or even a character on every line. If you have the following sequence:
 
 	magenta ball
 	red box
 	yellow cone
 
-And your cursor was at the end of the word `magenta`, using Tabularity to quote the first word would result in:
+And your cursor is at the end of the word `magenta`, using Tabularity to quote the word would result in:
 
 	"magenta" ball
 	red "box"
 	"yellow" cone
 
-To avoid this, you can either move the cursor to a different position before executing the command or use Tabular to align the words beforehand (`Tab / ` should do the trick). If you prefix your command with a `:`, Tabularity will execute it as if you used `:` in vim on each line it decides is relevant.
+If your intent was instead to quote every first word, you can either move the cursor to a different position before executing the command or use Tabular to align the words beforehand (`Tab / ` should do the trick). If you prefix your command with a `:`, Tabularity will execute it as if you used `:` in vim on each line it decides is relevant.
 
 Another useful functionality of Tabularity is folding/unfolding words into rows. For example, imagine you have the following string:
 
@@ -145,10 +145,10 @@ For example, if you have the following code:
 	#	bar
 	#	food
 	################################
-	def new function(world, bar, food):
+	def new_function(world, bar, food):
 		...
 
-You can auto-fill available arguments by putting the cursor on one of the arguments in the new function and running `tabularity#Complete()`, this will result in `world` and `bar` getting populated based on their descriptions in other function docstrings:
+You can auto-fill available argument descriptions in `new_function` by putting the cursor on one of the arguments in the new function and running `tabularity#Complete()`, this will result in `world` and `bar` getting populated based on their descriptions in other function docstrings:
 
 	################################
 	# Description:
@@ -173,7 +173,7 @@ You can auto-fill available arguments by putting the cursor on one of the argume
 	#	bar		Bar cannot be supplied without FOO
 	#	food
 	################################
-	def new function(world, bar, food):
+	def new_function(world, bar, food):
 		...
 
 The `food` argument will not be populated, since we haven't used it before.

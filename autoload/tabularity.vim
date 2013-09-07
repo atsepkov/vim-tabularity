@@ -221,13 +221,19 @@ endfunction
 
 " This function effectively undoes the unfolding done by the previous one
 function! tabularity#Fold(...)
+	let s = line('.')
+	let l = getline('.')
 	if a:0 > 0
 		let range = s:getRange(a:1)
 	else
 		let range = s:getRange()
 	endif
-	execute range[1]
+	let n = s:detectCommonPrefix(l, getline(s-1), getline(s+1))
 	while range[1] > range[0]
+		execute range[1]
+		let l = getline(range[1])
+		let p = substitute(l[0:n], '[&|*.^$]', '\\\0', 'g')
+		execute 'silent! s/^' . p . '/ /'
 		normal ^d0i
 		let range[1] -= 1
 	endwhile
