@@ -207,7 +207,7 @@ function! tabularity#Unfold(...)
 		let delim = ' '
 	endif
 	let pos = getpos('.')
-	normal ^
+	normal ^e
 	let m = col('.')
 	normal $B
 	let c = col('.')

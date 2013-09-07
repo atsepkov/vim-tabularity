@@ -190,7 +190,8 @@ Here are some mappings I use for Tabularity to get you started:
 	inoremap <silent> : :<Esc>:call tabularity#Align(':')<CR>a
 
 	" .vimrc
-	nnoremap <Tab><Enter> :call tabularity#Unfold()
-	nnoremap <Tab><BS> :call tabularity#Fold()
-	nnoremap <Tab><Tab> :call tabularity#Complete()
-	nnoremap <Tab><Space> :call tabularity#Do()
+	nnoremap <Tab><Enter> :call tabularity#Unfold()<CR>
+	nnoremap <Tab><BS> :call tabularity#Fold()<CR>
+	nnoremap <Tab><Tab> :call tabularity#Complete()<CR>
+	nnoremap <Tab><Space> :call tabularity#Do()<CR>
+	nnoremap <Tab>d :call tabularity#Unfold()<CR>:call tabularity#Complete()<CR>
