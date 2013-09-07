@@ -20,7 +20,7 @@ Common Use Cases
 
 Tabular plugin lets you effortlessly align multiple rows by specifying a pivoting character sequence to use. Unfortunately, it will erroneously align parent element in this Perl hash when using `=>` for alignment:
 
-	foo = > {
+	foo => {
 		bar => 1,
 		bazz => 2,
 	}
@@ -28,6 +28,16 @@ Tabular plugin lets you effortlessly align multiple rows by specifying a pivotin
 Tabularity will not make the same mistake. You can use Tabularity's Align function to specify a delimiter to align on, and also an optional regex to use for detecting range bounds. For example, to auto-align all rows on `=>` in Perl automatically, you can add the following mapping to your `ftplugin/perl.vim`:
 
 	inoremap => =><Esc>:call tabularity#Align('=>')<CR>a
+
+Now every time you add a new line to the above hash, it will auto-align itself:
+
+	foo => {
+		bar  => 1,
+		bazz => 2,
+		o    => 'cool'
+	}
+
+In fact, you can map this command to trigger on `>` alone rather than `=>` to avoid the half-second wait vim will introduce when typing `=`. Don't worry, it won't trigger on `>` comparison in an if statement because there is no `=>` anywhere to align on.
 
 But that's just the tip of the iceberg. Imagine you're cleaning up some Perl code, and wish to convert the following array of N items (where N is a really large number) to standard array format, as seen in other languages:
 
@@ -107,3 +117,20 @@ The result will be:
 `tabularity#Fold()` will perform the reverse operation.
 
 Speaking of comments, if you ever had to write docstrings for functions, you know how much of a pain it can be to make sure they are consistent and up-to-date. Adding a new function with a docstring to an already-existing behemoth module can be annoying. You know what arguments it needs, but the descriptions for them will need to be copy-pasted from other docstrings. `tabularity#Complete()` will handle that for you automatically, it will search the file for other lines beginning the same way, and complete each line using the first-found match.
+
+My Personal Mappings
+====================
+
+Here are some mappings I use for Tabularity to get you started:
+
+	" ftplugin/perl.vim
+	inoremap <silent> > ><Esc>:call tabularity#Align('=>')<CR>a
+
+	" ftplugin/python.vim
+	inoremap <silent> : :<Esc>:call tabularity#Align(':')<CR>a
+
+	" .vimrc
+	nnoremap <Tab><Enter> :call tabularity#Unfold()
+	nnoremap <Tab><BS> :call tabularity#Fold()
+	nnoremap <Tab><Tab> :call tabularity#Complete()
+	nnoremap <Tab><Tab> :call tabularity#Do()
