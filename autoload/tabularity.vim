@@ -64,7 +64,6 @@ function! s:getRange(...)
 	endif
 
 	return [s, f]
-"	return s . ',' . f
 endfunction
 
 function! s:getChar()
@@ -113,7 +112,11 @@ function! tabularity#Command(command, ...)
 	endif
 	let pos = getpos('.')
 	let column = col('.')
-	execute range[0] . ',' . range[1] . ' normal ' . column . 'lb ' . a:command
+	if a:command[0] == ':'
+		execute range[0] . ',' . range[1] . a:command[1:]
+	else
+		execute range[0] . ',' . range[1] . ' normal ' . column . 'lb ' . a:command
+	endif
 	call setpos('.', pos)
 endfunction
 
@@ -166,6 +169,26 @@ function! tabularity#Fold(...)
 	while range[1] > range[0]
 		normal ^d0i
 		let range[1] -= 1
-	endw
-"	normal Bi
+	endwhile
+endfunction
+
+
+" This function finishes the line using other lines that start the same way in
+" this file, in case of multiple matches, picks first-found match
+function! tabularity#Complete(...)
+	if a:0 > 0
+		let range = s:getRange(a:1)
+	else
+		let range = s:getRange()
+	endif
+	let pos = getpos('.')
+	let flags = 'nb'
+	while range[0] <= range[1]
+		let n = search('^' . getline(range[0]))
+		let l = substitute(getline(n), '[&|*.^$]', '\\\0', 'g')
+		execute 'silent! ' . range[0] .'s/^.*$/' . l . '/'
+		let range[0] += 1
+		normal j
+	endwhile
+	call setpos('.', pos)
 endfunction
