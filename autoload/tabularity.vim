@@ -39,24 +39,85 @@
 
 
 " private functions
+function! s:detectCommonPrefix(cur, prev, next)
+	" if one of the strings is completely identical to cur, it will be
+	" skipped,if both are, the return value is entire length of the string
+	" NOTE: this is essentially n^2 algorithm now due to the substring check
+	" inside the while loop, this could be optimized to n if we modify it to
+	" only check the last character
+	if a:next == a:cur && a:prev == a:cur
+		return len(a:cur)-1
+	endif
+	let l = 0
+	if a:prev != a:cur
+		let ok = 1
+	endif
+
+	" try previous first
+	while ok
+		if a:prev[0:l] == a:cur[0:l]
+			let l += 1
+		else
+			let ok = 0
+		endif
+	endwhile
+
+	" see if next one goes further
+	if a:next != a:cur
+		let ok = 1
+	endif
+	let n = 0
+	while ok
+		if a:next[0:l] == a:cur[0:l]
+			let n = 1
+			let l += 1
+		else
+			let ok = 0
+		endif
+	endwhile
+
+	" now undo any same characters from prefix if they're in the middle of a
+	" word that hasn't finished
+	if n
+		let cmp = a:next
+	else
+		let cmp = a:prev
+	endif
+	while (cmp[l-1] =~ '[a-z0-9_]' && cmp[l] =~ '[a-z0-9_]') || (a:cur[l-1] =~ '[a-z0-9_]' && a:cur[l] =~ '[a-z0-9_]')
+		let l -= 1
+	endw
+	return l-1
+endfunction
+
 function! s:getRange(...)
 	" if 'validation' regex was provided, check if the line matches it before
 	" attempting any further logic
+	" if no validation regex was provided, the common non-mid-word prefix
+	" between previous or next line will be used in its place.
+	let s = line('.')
 	let l = getline('.')
 	if a:0 > 0
 		if l !~# a:1
 			return
 		endif
+		let pattern = a:1
+	else
+		let n = s:detectCommonPrefix(l, getline(s-1), getline(s+1))
+		if n == -1
+			" auto fail
+			let pattern = '^$'
+		else
+			let pattern = '^' . substitute(l[0:n], '[&|*.^$]', '\\\0', 'g') . '.*'
+		endif
 	endif
 
 	" first count back and forward based on indent to figure out when to stop
-	let s = line('.')
 	let f = s
 	let myindent = indent(s)
-	while indent(s-1) == myindent && (a:0 == 0 || getline(s-1) =~# a:1)
+	while indent(s-1) == myindent && getline(s-1) =~# pattern
 		let s -= 1
 	endwhile
-	while indent(f+1) == myindent && (a:0 == 0 || getline(f+1) =~# a:1)
+	while indent(f+1) == myindent && getline(f+1) =~# pattern
 		let f += 1
 	endwhile
 	if s == f

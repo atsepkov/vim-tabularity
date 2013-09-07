@@ -70,7 +70,7 @@ And your cursor was at the end of the word `magenta`, using Tabularity to quote 
 
 To avoid this, you can either move the cursor to a different position before executing the command or use Tabular to align the words beforehand (`Tab / ` should do the trick). If you prefix your command with a `:`, Tabularity will execute it as if you used `:` in vim on each line it decides is relevant.
 
-Another userful functionality of Tabularity is folding/unfolding words into rows. For example, imagine you have the following string:
+Another useful functionality of Tabularity is folding/unfolding words into rows. For example, imagine you have the following string:
 
 	The quick brown fox jumped over the lazy dog
 
@@ -86,13 +86,14 @@ Running `tabularity#Unfold()` on it, will produce the following result:
 	lazy 
 	dog
 
-This unfolding will also make use of your indentation/language settings. Which means that if you're working in Perl and the original line looked like this:
+This unfolding will also make use of your indentation/comment language settings. Which means that if you're working in Perl and the original data looked like this (with cursor on the second line):
 
+	# This is a comment:
 	#	The quick brown fox jumped over the lazy dog
 
 The result will be:
 
-
+	# This is a comment:
 	#	The 
 	#	quick 
 	#	brown 
