@@ -188,6 +188,8 @@ function! tabularity#Do(...)
 	let c = s:getChar()
 	while c != "\<CR>"
 		let seq .= c
+		redraw
+		echon seq
 		let c = s:getChar()
 	endwhile
 	if a:0 > 0
