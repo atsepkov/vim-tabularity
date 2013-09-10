@@ -49,6 +49,7 @@ function! s:detectCommonPrefix(cur, prev, next)
 		return len(a:cur)-1
 	endif
 	let l = 0
+	let ok = 0
 	if a:prev != a:cur
 		let ok = 1
 	endif
@@ -63,6 +64,7 @@ function! s:detectCommonPrefix(cur, prev, next)
 	endwhile
 
 	" see if next one goes further
+	let ok = 0
 	if a:next != a:cur
 		let ok = 1
 	endif
@@ -98,14 +100,13 @@ function! s:getRange(...)
 	let l = getline('.')
 	if a:0 > 0
 		if l !~# a:1
-			return
+			return -1
 		endif
 		let pattern = a:1
 	else
 		let n = s:detectCommonPrefix(l, getline(s-1), getline(s+1))
 		if n == -1
-			" auto fail
-			let pattern = '^$'
+			let pattern = ''
 		else
 			let pattern = '^' . substitute(l[0:n], '[&|*.^$]', '\\\0', 'g') . '.*'
 		endif
@@ -114,14 +115,14 @@ function! s:getRange(...)
 	" first count back and forward based on indent to figure out when to stop
 	let f = s
 	let myindent = indent(s)
-	while indent(s-1) == myindent && getline(s-1) =~# pattern
+	while indent(s-1) == myindent && getline(s-1) !~# '^\s*$' && getline(s-1) =~# pattern
 		let s -= 1
 	endwhile
-	while indent(f+1) == myindent && getline(f+1) =~# pattern
+	while indent(f+1) == myindent && getline(f+1) !~# '^\s*$' && getline(f+1) =~# pattern
 		let f += 1
 	endwhile
 	if s == f
-		return
+		return -1
 	endif
 
 	return [s, f]
