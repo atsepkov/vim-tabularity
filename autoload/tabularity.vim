@@ -121,9 +121,6 @@ function! s:getRange(...)
 	while indent(f+1) == myindent && getline(f+1) !~# '^\s*$' && getline(f+1) =~# pattern
 		let f += 1
 	endwhile
-	if s == f
-		return -1
-	endif
 
 	return [s, f]
 endfunction
@@ -150,6 +147,9 @@ function! tabularity#Align(delim, ...)
 	if exists(':Tabularize') && getline('.') =~# '^.*' . a:delim && (getline(line('.')-1) =~# p || getline(line('.')+1) =~# p)
 		if a:0 > 0
 			let range = s:getRange(a:1)
+			if range == -1
+				return
+			endif
 		else
 			let range = s:getRange()
 		endif
@@ -169,6 +169,9 @@ endfunction
 function! tabularity#Command(command, ...)
 	if a:0 > 0
 		let range = s:getRange(a:1)
+		if range == -1
+			return
+		endif
 	else
 		let range = s:getRange()
 	endif
@@ -228,6 +231,9 @@ function! tabularity#Fold(...)
 	let l = getline('.')
 	if a:0 > 0
 		let range = s:getRange(a:1)
+		if range == -1
+			return
+		endif
 	else
 		let range = s:getRange()
 	endif
@@ -248,6 +254,9 @@ endfunction
 function! tabularity#Complete(...)
 	if a:0 > 0
 		let range = s:getRange(a:1)
+		if range == -1
+			return
+		endif
 	else
 		let range = s:getRange()
 	endif
