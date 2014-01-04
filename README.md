@@ -18,7 +18,17 @@ Usable Functions
 Common Use Cases
 ================
 
-Tabular plugin lets you effortlessly align multiple rows by specifying a pivoting character sequence to use. Unfortunately, it will erroneously align parent element in this Perl hash when using `=>` for alignment:
+Have you ever copy-pasted a chunk of code from the web only to be stuck with a bunch of line numbers that you must manually remove? `tabularity#Do()` solves that problem. I mapped mine to `<Tab><Space>`:
+
+	nnoremap <Tab><Space> :call tabularity#Do()<CR>
+
+Now when faced with that situation, I navigate to one of the problematic lines, invoke Tabularity and enter the following macro to delete the first word on the given line:
+
+	<Home>dw
+
+Like magic, all consecutive lines starting with a line number will have the number removed (without touching line numbers in any other section, that you may wish to preserve).
+
+Tabularity also picks up where Tabular left off. Tabular plugin lets you effortlessly align multiple rows by specifying a pivoting character sequence to use. Unfortunately, it will erroneously align parent element to children in this Perl hash when using `=>` for alignment:
 
 	foo => {
 		bar => 1,
@@ -29,7 +39,7 @@ Tabularity will not make the same mistake. You can use Tabularity's Align functi
 
 	inoremap => =><Esc>:call tabularity#Align('=>')<CR>a
 
-Now every time you add a new line to the above hash, it will auto-align itself:
+Now every time you add a new line to the above hash, the hash will auto-align itself:
 
 	foo => {
 		bar  => 1,
